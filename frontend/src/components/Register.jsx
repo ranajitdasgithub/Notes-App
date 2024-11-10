@@ -1,19 +1,29 @@
 import React, { useState } from "react";
 
-const Login = () => {
+const Register = () => {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-  };
+  function handleSubmit(e) {
+    e.preventDefault(); // Prevent the default form submission
+    console.log(email, password);
+  }
+
   return (
     <div>
-      <h2>Login</h2>
+      <h2>Register</h2>
       <form onSubmit={handleSubmit}>
+      <label>Name:</label>
+        <input
+          onChange={(e) => setName(e.target.value)}
+          type="text"
+          placeholder="Enter Name"
+          required // Optional: make the field required
+        />
+        <br />
         <label>Email:</label>
         <input
-          className="email"
           onChange={(e) => setEmail(e.target.value)}
           type="email"
           placeholder="Enter email"
@@ -22,7 +32,6 @@ const Login = () => {
         <br />
         <label>Password:</label>
         <input
-          className="password"
           onChange={(e) => setPassword(e.target.value)}
           type="password" // Change type to password
           placeholder="Enter password"
@@ -35,4 +44,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;
