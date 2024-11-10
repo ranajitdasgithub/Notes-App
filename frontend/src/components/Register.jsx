@@ -1,20 +1,38 @@
+import axios from "axios";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   function handleSubmit(e) {
     e.preventDefault(); // Prevent the default form submission
-    console.log(email, password);
+    let payload = {
+      name,
+      email,
+      password,
+    };
+    axios
+      .post("http://localhost:4000/user/signup", payload)
+      .then((response) => {
+        console.log(response);
+        alert("Signup successful");
+        navigate("/login");
+      })
+      .catch((error) => {
+        // Handle error (e.g., show an error message)
+        console.error("Signup failed:", error);
+      });
   }
 
   return (
     <div>
       <h2>Register</h2>
       <form onSubmit={handleSubmit}>
-      <label>Name:</label>
+        <label>Name:</label>
         <input
           onChange={(e) => setName(e.target.value)}
           type="text"

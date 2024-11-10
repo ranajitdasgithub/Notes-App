@@ -18,22 +18,7 @@ app.use(authentication);
 app.get("/", (req, res) => {
   res.send("Hello world");
 });
-// app.post("/signup", async (req, res) => {
-//   const { email, password, name } = req.body;
-//   console.log(email, password, name);
-//   const user = new userModel({
-//     email,
-//     password,
-//     name,
-//   });
-//   try {
-//     await user.save();
-//     res.json({ msg: "Signup Successfully" });
-//   } catch (err) {
-//     console.log(err);
-//     res.send("Something went wrong, try later");
-//   }
-// });
+
 
 app.listen(PORT, async () => {
   try {
