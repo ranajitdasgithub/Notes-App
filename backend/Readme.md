@@ -8,3 +8,6 @@
 mongo user name- ranajit
 mongo user pass- ranajit
 url- mongodb+srv://ranajit:<db_password>@cluster0.gdgqr.mongodb.net/
+
+
+Note- Controller and Routes folder name is same

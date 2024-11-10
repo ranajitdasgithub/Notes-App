@@ -1,56 +1,73 @@
-const {Router}=require("express")
-const bcrypt=require("bcrypt")
-const jwt=require("jsonwebtoken")
-require("dotenv").config()
+const { Router } = require("express");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
-const {userModel}=require("../models/user.model")
+const { userModel } = require("../models/User");
 
-const userController=Router()
+const userController = Router();
 
+// Signup route
+userController.post("/signup", async (req, res) => {
+  const { email, password, name } = req.body;
 
-userController.post("/signup",(req,res)=>{
-    const {email,password,name}=req.body;
-    console.log(email,password)
-    bcrypt.hash(password,5, async function(err,hash){
-        if(err){
-            res.send("Something went wrong, please try again later")
-        }
-        const user=new userModel({
-            email,
-            password:hash,
-            name
-        })
-        try{
-            await user.save()
-            res.json({"msg":"Signup Successfully"})
-        }
-        catch(err){
-            console.log(err)
-            res.send("Something went wrong, try later")
-        }
-    })
-})
+  // Input validation
+  if (!email || !password || !name) {
+    return res.status(400).json({ msg: "All fields are required" });
+  }
 
-userController.post("/login",async (req,res)=>{
-    const {email,password}= req.body;
-    const user = await userModel.findOne({email})
-    //console.log(user) //--->total obj of particular user
-    const hash = user.password
-    bcrypt.compare(password,hash,function(err,result){
-        if(err){
-            res.send("Something went wrond, try later")
-        }
-        if(result){
-            //this _id send as decoded for check specific user
-            const token=jwt.sign({userId : user._id},process.env.SECRET_KEY);
-            res.send({msg:"Login successful",token})
-        }
-        else{
-            res.send("Invalid credential, plz signup if you haven't")
-        }
-    })
-})
+  try {
+    const hash = await bcrypt.hash(password, 5);
+    const user = new userModel({ email, password: hash, name });
 
-module.exports={
-    userController
-}
+    await user.save();
+    res.json({ msg: "Signup Successfully" });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ msg: "Something went wrong, please try again later" });
+  }
+});
+
+// Login route
+userController.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  // Input validation
+  if (!email || !password) {
+    return res.status(400).json({ msg: "Email and password are required" });
+  }
+
+  try {
+    const user = await userModel.findOne({ email });
+
+    if (!user) {
+      return res
+        .status(401)
+        .json({ msg: "Invalid credentials, please signup if you haven't" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (isMatch) {
+      const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, {
+        expiresIn: "1h",
+      });
+      res.json({ msg: "Login successful", token });
+    } else {
+      res
+        .status(401)
+        .json({ msg: "Invalid credentials, please signup if you haven't" });
+    }
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ msg: "Something went wrong, please try again later" });
+  }
+});
+
+module.exports = {
+  userController,
+};
